@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+		<link rel="stylesheet" type="text/css" href="https://unpkg.com/element-ui@2.15.1/lib/theme-chalk/index.css" />
+		<!-- <link rel="stylesheet" type="text/css" href="css/index.css" /> -->
+		<style type="text/css">
+			* {
+				margin: 0;
+				padding: 0;
+			}
+
+			.el-header,
+			.el-footer {
+				background-color: #B3C0D1;
+				color: #333;
+				text-align: center;
+				line-height: 60px;
+			}
+
+			.el-aside {
+				background-color: #D3DCE6;
+				color: #333;
+				text-align: center;
+				line-height: 200px;
+			}
+
+			.el-main {
+				background-color: #E9EEF3;
+				color: #333;
+				text-align: center;
+				line-height: 160px;
+			}
+
+			/* 自己写的开始 */
+			a {
+				text-decoration: none;
+				color: #606266;
+			}
+
+			a:hover {
+				color: #80cbff;
+			}
+
+			.header {
+				height: 47px;
+				background-color: #222222;
+				color: #fff;
+				line-height: 47px;
+			}
+
+			.header h4 {
+				text-align: left;
+				font-size: 20px;
+				font-weight: 700;
+				padding-left: 40px;
+				display: inline-block;
+			}
+
+			.header .right {
+				float: right;
+				padding-right: 30px;
+			}
+
+			.header .right img {
+				height: 20px;
+				width: 20px;
+				line-height: 20px;
+				display: inline-block;
+				vertical-align: middle;
+			}
+
+			.side {
+				float: left;
+				/* height: 675px; */
+				height: 706px;
+				width: 201px;
+				background-color: #fff;
+			}
+
+			.head {
+				/* height: 30px; */
+				background-color: #fff;
+				padding: 5px 0 0 5px;
+			}
+
+			.head input {
+				float: left;
+				margin-right: 10px;
+				height: 29px;
+				line-height: 20px;
+				padding: 2px 12px;
+			}
+
+			.head input.search {
+				margin-top: 1px;
+				height: 20px;
+			}
+
+			.head .ssk {
+				height: 19px;
+				line-height: 19px;
+			}
+
+			.main {
+				float: left;
+				height: 530px;
+			}
+
+			.el-main {
+				padding: 0;
+			}
+
+			.el-container {
+				height: 517px;
+			}
+			#table {
+				font-size: 18px;
+			}
+			/* 自己写的结束 */
+		</style>
+	</head>
+	<body>
+		<!-- <script src="js/vue.js" type="text/javascript" charset="utf-8"></script> -->
+		<!-- <script src="js/index.js" type="text/javascript" charset="utf-8"></script> -->
+
+		<!-- <script src="//unpkg.com/vue/dist/vue.js"></script> -->
+		<!-- <script src="//unpkg.com/element-ui@2.15.1/lib/index.js"></script> -->
+
+		<script src="js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+		<div id="app">
+			<div class="header">
+				<h4>图书管理系统</h4>
+				<div class="right">
+					<img src="img/admin.png">
+					<el-dropdown>
+						<span class="el-dropdown-link">
+							个人中心<i class="el-icon-arrow-down el-icon--right"></i>
+						</span>
+						<el-dropdown-menu slot="dropdown">
+							<el-dropdown-item>编辑资料</el-dropdown-item>
+							<el-dropdown-item><a href="javascript:" @click="logout">退出登录</a></el-dropdown-item>
+						</el-dropdown-menu>
+					</el-dropdown>
+				</div>
+			</div>
+			<div>
+				<div class="side" style="background-color: #434a50;">
+					<el-col :span="24">
+						<el-menu class="el-menu-vertical-demo" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b">
+							<el-submenu index="1">
+								<template slot="title">
+									<i class="el-icon-location"></i>
+									<span>信息管理</span>
+								</template>
+								<el-menu-item index="1-1">图书管理</el-menu-item>
+								<el-menu-item index="1-2">读者管理</el-menu-item>
+								<el-menu-item index="1-3">借阅管理</el-menu-item>
+						</el-menu>
+					</el-col>
+					</el-row>
+				</div>
+				<div class="main">
+					<div id="table">
+				
+						<!-- 搜索添加部分开始 -->
+						<div class="head">
+							<input v-model="bookName" type="text" class="ssk search" placeholder="请输入书名" />
+							<input @click="search" class="el-button" type="button" class="search" value="搜索" />
+							<input @click="dialogFormVisible = true" class="el-button" type="button" class="add" value="添加" />
+						</div>
+						<!-- 搜索添加部分结束 -->
+				
+						<!-- 添加图书Dialog开始 -->
+						<el-dialog title="添加图书" :visible.sync="dialogFormVisible">
+							<el-form :model="form">
+								<el-form-item label="图书名称" :label-width="formLabelWidth">
+									<el-input v-model="form.name" autocomplete="off"></el-input>
+								</el-form-item>
+								<el-form-item label="图书作者" :label-width="formLabelWidth">
+									<el-input v-model="form.author" autocomplete="off"></el-input>
+								</el-form-item>
+								<el-form-item label="图书类型" :label-width="formLabelWidth">
+									<el-input v-model="form.category" autocomplete="off"></el-input>
+								</el-form-item>
+								<el-form-item label="图书出版社" :label-width="formLabelWidth">
+									<el-input v-model="form.publish" autocomplete="off"></el-input>
+								</el-form-item>
+								<el-form-item label="图书库存" :label-width="formLabelWidth">
+									<el-input v-model="form.stock" autocomplete="off"></el-input>
+								</el-form-item>
+							</el-form>
+							<div slot="footer" class="dialog-footer">
+								<el-button @click="addBooks_cancel">取 消</el-button>
+								<el-button type="primary" @click="addBooks_certain">确 定</el-button>
+							</div>
+						</el-dialog>
+						<!-- 添加图书Dialog结束 -->
+				
+						<!-- 编辑图书Dialog开始 -->
+						<el-dialog title="编辑图书" :visible.sync="dialogFormVisible_e">
+							<el-form :model="form_e">
+								<el-form-item label="图书名称" :label-width="formLabelWidth_e">
+									<el-input v-model="form_e.name" autocomplete="off"></el-input>
+								</el-form-item>
+								<el-form-item label="图书作者" :label-width="formLabelWidth_e">
+									<el-input v-model="form_e.author" autocomplete="off"></el-input>
+								</el-form-item>
+								<el-form-item label="图书类型" :label-width="formLabelWidth_e">
+									<el-input v-model="form_e.category" autocomplete="off"></el-input>
+								</el-form-item>
+								<el-form-item label="图书出版社" :label-width="formLabelWidth_e">
+									<el-input v-model="form_e.publish" autocomplete="off"></el-input>
+								</el-form-item>
+								<el-form-item label="图书库存" :label-width="formLabelWidth_e">
+									<el-input v-model="form_e.stock" autocomplete="off"></el-input>
+								</el-form-item>
+							</el-form>
+							<div slot="footer" class="dialog-footer">
+								<el-button @click="editBooks_cancel">取 消</el-button>
+								<el-button type="primary" @click="editBooks_certain">确 定</el-button>
+							</div>
+						</el-dialog>
+						<!-- 编辑图书Dialog结束 -->
+				
+						<!-- Table显示部分开始 -->
+						<el-table :data="messages" style="width: 100%">
+							<el-table-column prop="bookID" label="序号" width="200">
+							</el-table-column>
+							<el-table-column prop="bookName" label="书名" width="200">
+							</el-table-column>
+							<el-table-column prop="bookAuthor" label="作者" width="200">
+							</el-table-column>
+							<el-table-column prop="bookCategory" label="类型" width="200">
+							</el-table-column>
+							<el-table-column prop="bookPublish" label="出版社" width="210">
+							</el-table-column>
+							<el-table-column prop="bookStock" label="库存" width="200">
+							</el-table-column>
+							<el-table-column label="操作" width="100">
+								<template slot-scope="scope">
+									<el-button @click="delBook(scope.row)" type="text" size="small">删除</el-button>
+									<el-button @click="editBook(scope.$index, scope.row)" type="text" size="small">修改</el-button>
+								</template>
+							</el-table-column>
+						</el-table>
+						<!-- Table显示部分结束 -->
+				
+						<!-- 分页条部分开始 -->
+						<el-pagination background :page-size="page.page_row" :current-page="page.page_curr" layout="prev, pager, next"
+						 :total="page.page_total" @current-change="pageChange">
+						</el-pagination>
+						<!-- 分页条部分结束 -->
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- <script src="https://unpkg.com/vue/dist/vue.js"></script> -->
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+
+		<!-- <script src="https://unpkg.com/element-ui/lib/index.js"></script> -->
+		<script src="js/index.js" type="text/javascript" charset="utf-8"></script>
+
+		<!-- 引入axios -->
+		<script src="js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+
+
+		<script type="text/javascript">
+			// Table vue
+			let table = new Vue({
+				el: '#app',
+				data: {
+					currAdmin: null,
+
+					// Table所用数据开始
+					messages: [],
+					bookName: '',
+					page: {
+						page_curr: 1, // 当前页
+						page_row: 10, //一页多少行
+						page_total: null //一共多少行
+					},
+					// Table所用数据结束
+
+					// 添加Dialog所用数据开始
+					dialogTableVisible: false,
+					dialogFormVisible: false,
+					form: {
+						name: '',
+						author: '',
+						category: '',
+						publish: '',
+						stock: ''
+					},
+					formLabelWidth: '120px',
+					// 添加Dialog所用数据结束
+
+					// 编辑Dialog所用数据开始
+					dialogTableVisible_e: false,
+					dialogFormVisible_e: false,
+					form_e: {
+						ID: '',
+						name: '',
+						author: '',
+						category: '',
+						publish: '',
+						stock: ''
+					},
+					formLabelWidth_e: '120px',
+					// 编辑Dialog所用数据结束
+				},
+				methods: {
+					// 退出登录
+					logout() {
+						console.log(666);
+						// window.location.replace('login.html');
+
+						location.href = 'login.html';
+					},
+					// 确定添加图书
+					addBooks_certain() {
+						console.log(this.form.name);
+
+						axios.request({
+							url: 'http://localhost:8080/bms/AddBookServlet',
+							params: {
+								bookName: this.form.name,
+								bookAuthor: this.form.author,
+								bookCategory: this.form.category,
+								bookPublish: this.form.publish,
+								bookStock: this.form.stock
+							}
+						}).then((res) => {
+							// console.log(res);
+							if (res.data.result == "添加成功") {
+								this.$message('成功添加图书')
+							} else {
+								this.$message('图书添加失败')
+							}
+						})
+						this.dialogFormVisible = false;
+						this.loadBooks();
+					},
+					// 取消添加图书
+					addBooks_cancel() {
+						this.dialogFormVisible = false;
+						this.$message('取消添加图书');
+					},
+					// 按书名模糊查找
+					search() {
+						// console.log(666);
+						this.loadBooks();
+					},
+					// 点击页码更新页面
+					pageChange(num) {
+						this.page.page_curr = num;
+						// search.search();
+						this.loadBooks();
+					},
+					// 加载Table 显示图书信息
+					loadBooks() {
+						axios.request({
+							url: 'http://localhost:8080/bms/GetBookListServlet',
+							params: {
+								page_curr: this.page.page_curr,
+								page_row: this.page.page_row,
+								bookName: this.bookName
+							}
+						}).then((res) => {
+							// console.log(res.data);
+							this.page.page_total = res.data.page_total;
+							this.messages = res.data.books;
+						})
+					},
+					// 删除图书
+					delBook(row) {
+						this.$confirm('是否删除消息, 是否继续?', '提示', {
+							confirmButtonText: '删除', //确定按钮的文字
+							cancelButtonText: '取消', //取消按钮文字
+							type: 'warning' //图标类型
+						}).then(() => { //确定按钮的执行代码
+							axios.request({
+								url: 'http://localhost:8080/bms/DelBookServlet',
+								params: {
+									bookID: row.bookID,
+								}
+
+							}).then((res) => {
+								console.log(typeof res.data);
+								console.log(res.data["isOk"]);
+								console.log(res.data.isOk);
+								console.log(res.data);
+								if (res.data.isOk) {
+									this.$message('删除成功');
+								} else {
+									this.$message('删除失败');
+								}
+								this.loadBooks();
+
+							})
+						}).catch(() => { //取消按钮的执行代码
+
+						});
+					},
+					// 弹起修改图书信息Dialog
+					editBook(index, row) {
+						this.dialogFormVisible_e = true;
+						this.form_e.ID = row.bookID;
+						this.form_e.name = row.bookName;
+						this.form_e.author = row.bookAuthor;
+						this.form_e.category = row.bookCategory;
+						this.form_e.publish = row.bookPublish;
+						this.form_e.stock = row.bookStock;
+						console.log(row);
+
+					},
+					// 取消修改图书信息
+					editBooks_cancel() {
+						this.dialogFormVisible_e = false;
+						this.$message('取消修改图书');
+					},
+					// 确定修改图书信息
+					editBooks_certain() {
+						console.log(this.form_e.ID);
+						console.log(this.form_e.name);
+						console.log(this.form_e.author);
+						console.log(this.form_e.category);
+						console.log(this.form_e.publish);
+						console.log(this.form_e.stock);
+						axios.request({
+							url: 'http://localhost:8080/bms/UpdateBookServlet',
+							params: {
+								bookID: this.form_e.ID,
+								bookName: this.form_e.name,
+								bookAuthor: this.form_e.author,
+								bookCategory: this.form_e.category,
+								bookPublish: this.form_e.publish,
+								bookStock: this.form_e.stock
+							}
+						}).then((res) => {
+							// console.log(res);
+							if (res.data.result == "修改成功") {
+								this.$message('成功修改图书')
+							} else {
+								this.$message('图书修改失败')
+							}
+							this.loadBooks();
+						})
+						this.dialogFormVisible_e = false;
+					}
+				},
+				created() {
+					this.currAdmin = JSON.parse(sessionStorage.getItem('loginAdmin'))
+					this.loadBooks();
+					console.log(this.currAdmin);
+					this.$message('欢迎回来，' + this.currAdmin.adminName + ' !');
+				}
+			})
+		</script>
+	</body>
+</html>

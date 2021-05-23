@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		<!-- 查找读者 -->
+		<div id="searchReader">
+			读者名<input type="text" v-model="readerName"/>
+			<button type="text" @click="loadMessageByName">查询</button>
+			读者号<input type="text" v-model="readerSno"/>
+			<button type="text" @click="loadMessageBySno">查询</button>
+			<ul>
+				<li v-for="m in messages">
+					<p>{{m.readerSno}}</p>
+					<p>{{m.readerName}}</p>
+					<p>{{m.readerSex}}</p>
+					<p>{{m.readerDepartment}}</p>
+					<p>{{m.readerProfession}}</p>
+				</li>
+			</ul>
+		</div>
+		
+		<!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			// 查找读者
+			let vue = new Vue({
+				//vue模板的范围是一个非body元素
+				el:'#searchReader',
+				//用于双向绑定的数据
+				data:{
+					readerName:'',
+					readerSno:'',
+					messages:[]
+				},
+				//定义Vue中调用的方法
+				methods:{
+					loadMessageByName(){
+						console.log("点击了查找");
+						// 同过网络（ajax）访问数据
+						axios.request({
+							url:'http://localhost:8080/bms/GetReaderListByName',
+							method:'get',
+							params:{
+								name:this.readerName
+							}
+						}).then((res)=>{
+							
+							this.messages = res.data;
+							console.log(this.messages);
+						})
+					},
+					loadMessageBySno(){
+						console.log("点击了查找");
+						// 同过网络（ajax）访问数据
+						axios.request({
+							url:'http://localhost:8080/bms/FindReaderListBySno',
+							method:'get',
+							params:{
+								sno:this.readerSno
+							}
+						}).then((res)=>{
+							
+							this.messages = res.data;
+							console.log(this.messages);
+						})
+					}
+				},
+				//生命周期中8个钩子函数中的一个，vue对象已经创建完成的阶段
+				created(){//created:function()
+					//this表示当前Vue对象
+					this.loadMessageByName()
+				}
+			})
+			
+		</script>
+	</body>

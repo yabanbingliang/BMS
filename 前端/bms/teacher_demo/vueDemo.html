@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title></title>
+	</head>
+	<body>
+		
+		<div id="app">
+			<input type="text" v-model="bookName"/>
+			<button @click="loadMessage">查询</button>
+			<ul>
+				<li v-for="m in messages">
+					<p>{{m.bookID}}</p>
+					<p>{{m.bookName}}</p>
+					<p>{{m.bookAuthor}}</p>
+					<p>{{m.bookCategory}}</p>
+					<p>{{m.bookPublish}}</p>
+					<p>{{m.bookStock}}</p>
+				</li>
+			</ul>
+		</div>
+		<!-- <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script> -->
+		<script src="js/vue.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/axios.min.js" type="text/javascript" charset="utf-8"></script>
+		<script type="text/javascript">
+			
+			let vue = new Vue({
+				//vue模板的范围是一个非body元素
+				el:'#app',
+				//用于双向绑定的数据
+				data:{
+					bookName:'',
+					messages:[]
+				},
+				//定义Vue中调用的方法
+				methods:{
+					loadMessage(){
+						// 同过网络（ajax）访问数据
+						// this.messages = [{"messageId":1,"publishName":"lisi","time":"May 9, 2021 11:44:13 AM","info":"hello"},{"messageId":2,"publishName":"zhangsan","time":"May 3, 2021 11:45:48 AM","info":"hahaha"}];
+						// console.log(this.messages);
+						axios.request({
+							url:'http://localhost:8080/bms/GetBookListByName',
+							method:'get',
+							params:{
+								name:this.bookName
+							}
+						}).then((res)=>{
+							
+							this.messages = res.data;
+							// console.log(this.messages);
+						})
+					}
+				},
+				//生命周期中8个钩子函数中的一个，vue对象已经创建完成的阶段
+				created(){//created:function()
+					//this表示当前Vue对象
+					this.loadMessage()
+				}
+			});
+		</script>
+	</body>
+</html>
